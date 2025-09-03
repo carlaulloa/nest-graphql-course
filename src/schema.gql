@@ -1,0 +1,11 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Query {
+  helloWorld: String!
+  randomNumber: Float!
+
+  """From zero to argument TO"""
+  randomFromZeroTo(to: Int): Int!
+}
