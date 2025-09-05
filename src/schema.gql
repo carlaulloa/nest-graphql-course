@@ -2,10 +2,47 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Todo {
+  """ID of todo"""
+  id: Int!
+  description: String!
+  done: Boolean!
+}
+
 type Query {
   helloWorld: String!
   randomNumber: Float!
 
   """From zero to argument TO"""
   randomFromZeroTo(to: Int): Int!
+  todos(
+    """Task status"""
+    done: Boolean
+  ): [Todo!]!
+  todo(id: Int!): Todo!
+  totalTodos: Int!
+  completedTodos: Int!
+  pendingTodos: Int!
+}
+
+type Mutation {
+  createTodo(createTodoInput: CreateTodoInput!): Todo!
+  updateTodo(updateTodoInput: UpdateTodoInput!): Todo!
+  removeTodo(id: Int!): Boolean!
+}
+
+input CreateTodoInput {
+  """Task name"""
+  description: String!
+}
+
+input UpdateTodoInput {
+  """Task id"""
+  id: Int!
+
+  """Task name"""
+  description: String
+
+  """Task status"""
+  done: Boolean
 }
