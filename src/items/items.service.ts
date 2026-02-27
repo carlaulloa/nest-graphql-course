@@ -1,0 +1,46 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateItemInput } from './dto/inputs/create-item.input';
+import { UpdateItemInput } from './dto/inputs/update-item.input';
+import { Item } from './entities/item.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+
+@Injectable()
+export class ItemsService {
+
+  constructor(
+    @InjectRepository(Item)
+    private readonly itemsRepository: Repository<Item>
+  ) {}
+
+  async create(createItemInput: CreateItemInput) {
+    const item = this.itemsRepository.create(createItemInput)
+    return this.itemsRepository.save(item);
+  }
+
+  async findAll() {
+    return this.itemsRepository.find();
+  }
+
+  async findOne(id: string): Promise<Item> {
+    const item = await this.itemsRepository.findOne({ where: { id } });
+    if (!item) {
+      throw new NotFoundException('Item not found');
+    }
+    return item;
+  }
+
+  async update(id: string, updateItemInput: UpdateItemInput): Promise<Item> {
+    const item = await this.itemsRepository.preload(updateItemInput);
+
+    if (!item) {
+      throw new NotFoundException('Item not found');
+    }
+
+    return this.itemsRepository.save(item);
+  }
+
+  remove(id: string) {
+    return `This action removes a #${id} item`;
+  }
+}

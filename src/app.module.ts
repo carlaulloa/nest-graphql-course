@@ -5,9 +5,13 @@ import { join } from 'path';
 import { HelloWorldModule } from './hello-world/hello-world.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { TodoModule } from './todo/todo.module';
+import { ItemsModule } from './items/items.module';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       playground: false,
@@ -16,8 +20,19 @@ import { TodoModule } from './todo/todo.module';
         ApolloServerPluginLandingPageLocalDefault()
       ]
     }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      autoLoadEntities: true,
+      synchronize: true,
+    }),
     HelloWorldModule,
     TodoModule,
+    ItemsModule,
   ],
   controllers: [],
 })
