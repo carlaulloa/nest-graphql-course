@@ -25,7 +25,7 @@ export class ItemsService {
   async findOne(id: string): Promise<Item> {
     const item = await this.itemsRepository.findOne({ where: { id } });
     if (!item) {
-      throw new NotFoundException('Item not found');
+      throw new NotFoundException(`Item with ID ${id} not found`);
     }
     return item;
   }
@@ -40,7 +40,9 @@ export class ItemsService {
     return this.itemsRepository.save(item);
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} item`;
+  async remove(id: string): Promise<Item> {
+    const item = await this.findOne(id);
+    await this.itemsRepository.remove(item);
+    return { ...item, id };
   }
 }
