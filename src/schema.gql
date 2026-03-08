@@ -68,6 +68,7 @@ type Mutation {
   updateItem(updateItemInput: UpdateItemInput!): Item!
   removeItem(id: ID!): Item!
   blockUser(id: ID!): User!
+  signup(signupInput: SignupInput!): String!
 }
 
 input CreateTodoInput {
@@ -97,4 +98,10 @@ input UpdateItemInput {
   quantity: Float
   quantityUnits: String
   id: ID!
+}
+
+input SignupInput {
+  fullName: String!
+  email: String!
+  password: String!
 }
