@@ -1,10 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignupInput } from './dto/inputs/signup.input';
 import { AuthResponse } from './types/auth-response.type';
 import { UsersService } from 'src/users/users.service';
 import { LoginInput } from './dto/inputs';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +30,7 @@ export class AuthService {
 
   async login(loginInput: LoginInput): Promise<AuthResponse> {
     const user = await this.usersService.findOneByEmail(loginInput.email);
-    if (!bcrypt.compareSync(loginInput.password, user.password)) {
+    if (!bcrypt.compareSync(loginInput.password, user.password!)) {
       throw new BadRequestException('Invalid credentials')
     }
     const token = this.generateToken(user.id);
@@ -37,6 +38,17 @@ export class AuthService {
       token,
       user
     }
+  }
+
+  async validateUser(id: string): Promise<User> {
+    const user = await this.usersService.findOneById(id);
+    if (!user.isActive) {
+      throw new UnauthorizedException('Invalid token');
+    }
+
+    delete user.password;
+
+    return user;
   }
 
 }
