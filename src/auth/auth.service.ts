@@ -51,4 +51,9 @@ export class AuthService {
     return user;
   }
 
+  revalidateToken(user: User): AuthResponse {
+    const token = this.generateToken(user.id);
+    return { token, user }
+  }
+
 }

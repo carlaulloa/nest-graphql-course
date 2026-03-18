@@ -6,6 +6,7 @@ import { User } from 'src/users/entities/user.entity';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { CurrentUser } from './decorators/user.decorator';
+import { ValidRoles } from './enums/valid-roles.enum';
 
 @Resolver()
 export class AuthResolver {
@@ -28,9 +29,8 @@ export class AuthResolver {
   @Query(() => AuthResponse, { name: 'revalidate' })
   @UseGuards(JwtAuthGuard)
   revalidateToken(
-    @CurrentUser() user: User
+    @CurrentUser([ValidRoles.Admin]) user: User
   ): AuthResponse {
-    // return this.authService.revalidateToken(user)
-    throw new Error('Method not implemented.');
+    return this.authService.revalidateToken(user)
   }
 }
