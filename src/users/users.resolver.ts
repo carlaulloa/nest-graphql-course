@@ -29,7 +29,10 @@ export class UsersResolver {
   }
 
   @Mutation(() => User)
-  async blockUser(@Args('id', { type: () => ID }) id: string): Promise<User> {
-    return this.usersService.block(id);
+  async blockUser(
+    @Args('id', { type: () => ID }) id: string  ,
+    @CurrentUser([ValidRoles.Admin]) user: User
+  ): Promise<User> {
+    return this.usersService.block(id, user);
   }
 }

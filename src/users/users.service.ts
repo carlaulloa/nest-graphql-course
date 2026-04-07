@@ -69,8 +69,11 @@ export class UsersService {
     return `This action removes a #${id} user`;
   }
 
-  async block(id: string): Promise<User> {
-    throw new Error('Method not implemented.');
+  async block(id: string, adminUser: User): Promise<User> {
+    const user = await this.findOneById(id);
+    user.isActive = false;
+    user.lastUpdateBy = adminUser;
+    return this.usersRepository.save(user);
   }
 
   private handleError(error: any): never {
