@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
-import { UpdateUserInput } from './dto/update-user.input';
+import { UpdateUserInput } from './dto/UpdateUserInput';
 import { User } from './entities/user.entity';
 import { SignupInput } from 'src/auth/dto/inputs/signup.input';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -61,8 +61,19 @@ export class UsersService {
     }
   }
 
-  update(id: number, updateUserInput: UpdateUserInput) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserInput: UpdateUserInput, adminUser: User): Promise<User> {
+    try {
+      const user = await this.usersRepository.preload({});
+      if (!user) {
+        throw new BadRequestException(`User #${id} not found`);
+      }
+
+      user.lastUpdateBy = adminUser;
+      
+      return await this.usersRepository.save(user);
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   remove(id: number) {
