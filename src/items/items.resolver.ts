@@ -3,20 +3,29 @@ import { ItemsService } from './items.service';
 import { Item } from './entities/item.entity';
 import { CreateItemInput } from './dto/inputs/create-item.input';
 import { UpdateItemInput } from './dto/inputs/update-item.input';
-import { ParseUUIDPipe } from '@nestjs/common';
+import { ParseUUIDPipe, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CurrentUser } from 'src/auth/decorators/user.decorator';
+import { User } from 'src/users/entities/user.entity';
 
 @Resolver(() => Item)
+@UseGuards(JwtAuthGuard)
 export class ItemsResolver {
   constructor(private readonly itemsService: ItemsService) {}
 
   @Mutation(() => Item)
-  async createItem(@Args('createItemInput') createItemInput: CreateItemInput) {
-    return this.itemsService.create(createItemInput);
+  async createItem(
+    @Args('createItemInput') createItemInput: CreateItemInput,
+    @CurrentUser() user: User
+  ) {
+    return this.itemsService.create(createItemInput, user);
   }
 
   @Query(() => [Item], { name: 'items' })
-  async findAll() {
-    return this.itemsService.findAll();
+  async findAll(
+    @CurrentUser() user: User
+  ) {
+    return this.itemsService.findAll(user);
   }
 
   @Query(() => Item, { name: 'item' })

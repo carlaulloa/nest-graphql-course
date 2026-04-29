@@ -4,6 +4,7 @@ import { UpdateItemInput } from './dto/inputs/update-item.input';
 import { Item } from './entities/item.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class ItemsService {
@@ -13,13 +14,15 @@ export class ItemsService {
     private readonly itemsRepository: Repository<Item>
   ) {}
 
-  async create(createItemInput: CreateItemInput) {
-    const item = this.itemsRepository.create(createItemInput)
+  async create(createItemInput: CreateItemInput, user: User) {
+    const item = this.itemsRepository.create({ ...createItemInput, user });
     return this.itemsRepository.save(item);
   }
 
-  async findAll() {
-    return this.itemsRepository.find();
+  async findAll(user: User) {
+    return this.itemsRepository.find({
+      where: { user: { id: user.id } }
+    });
   }
 
   async findOne(id: string): Promise<Item> {
