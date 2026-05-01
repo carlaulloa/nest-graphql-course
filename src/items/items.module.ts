@@ -9,4 +9,4 @@ import { Item } from './entities/item.entity';
   providers: [ItemsResolver, ItemsService],
   exports: [ItemsService, TypeOrmModule]
 })
-export class ItemsModule {}
+export class ItemsModule {} 
