@@ -11,6 +11,6 @@ import { ItemsModule } from 'src/items/items.module';
     ItemsModule
   ],
   providers: [UsersResolver, UsersService],
-  exports: [UsersService]
+  exports: [UsersService, TypeOrmModule]
 })
 export class UsersModule {}
