@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { ValidRoles } from 'src/auth/enums/valid-roles.enum';
+import { PaginationArgs, SearchArgs } from 'src/common/dto/args';
 
 @Injectable()
 export class UsersService {
@@ -29,14 +30,21 @@ export class UsersService {
     }
   }
 
-  async findAll(roles: ValidRoles[]): Promise<User[]> {
-    if(!roles.length) {
-      return this.usersRepository.find();
-    }
-    return this.usersRepository.createQueryBuilder()
+  async findAll(roles: ValidRoles[], paginationArgs: PaginationArgs, searchArgs: SearchArgs): Promise<User[]> {
+    const { limit, offset } = paginationArgs;
+    const { search } = searchArgs;
+    
+    const queryBuilder = this.usersRepository.createQueryBuilder()
+      .take(limit)
+      .skip(offset)
       .andWhere('ARRAY[roles] && ARRAY[:...roles]')
-      .setParameter('roles', roles)
-      .getMany();
+      .setParameter('roles', roles);
+
+    if (search) {
+      queryBuilder.andWhere('LOWER("fullName") LIKE :search', { search: `%${search.toLowerCase()}%` })
+    }
+
+    return queryBuilder.getMany();
   }
 
   async findOneByEmail(email: string): Promise<User> {
