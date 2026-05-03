@@ -5,6 +5,7 @@ import { Item } from './entities/item.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
+import { PaginationArgs } from 'src/common/dto/args/pagination.args';
 
 @Injectable()
 export class ItemsService {
@@ -19,9 +20,13 @@ export class ItemsService {
     return this.itemsRepository.save(item);
   }
 
-  async findAll(user: User) {
+  async findAll(user: User, paginationArgs: PaginationArgs) {
+    const { limit, offset } = paginationArgs;
+    
     return this.itemsRepository.find({
-      where: { user: { id: user.id } }
+      take: limit,
+      skip: offset,
+      where: { user: { id: user.id } },
     });
   }
 
