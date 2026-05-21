@@ -4,11 +4,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Item } from 'src/items/entities/item.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
-import { SEED_USERS, SEED_ITEMS } from './seed-data';
+import { SEED_USERS, SEED_ITEMS, SEED_LISTS } from './seed-data';
 import { UsersService } from 'src/users/users.service';
 import { ItemsService } from 'src/items/items.service';
 import { ListItem } from 'src/list-item/entities/list-item.entity';
 import { List } from 'src/list/entities/list.entity';
+import { ListService } from 'src/list/list.service';
+import { ListItemService } from 'src/list-item/list-item.service';
 
 @Injectable()
 export class SeedService {
@@ -27,6 +29,8 @@ export class SeedService {
     private readonly listItemRepository: Repository<ListItem>,
     private readonly userService: UsersService,
     private readonly itemsService: ItemsService,
+    private readonly listService: ListService,
+    private readonly listItemService: ListItemService
   ){
     this.isProd = this.configService.get('STATE') === 'prod';
   }
@@ -42,6 +46,11 @@ export class SeedService {
 
     await this.loadItems(user);
 
+    const list = await this.loadLists(user);
+
+    const items = await this.itemsService.findAll(user, { limit: 15 }, {  });
+
+    await this.loadListItems(list, items);
     return true;
   }
 
@@ -84,6 +93,27 @@ export class SeedService {
       items.push(
         await this.itemsService.create(item as any, user)
       );
+    }
+  }
+
+  async loadLists(user: User): Promise<List> {
+      const lists: List[] = [];
+      for (const list of SEED_LISTS) {
+        lists.push(
+          await this.listService.create(list, user)
+        );
+      }
+      return lists[0];
+  }
+
+  async loadListItems(list: List, items: Item[]): Promise<void> {
+    for (const item of items) {
+      await this.listItemService.create({
+        listId: list.id,
+        itemId: item.id,
+        quantity: Math.floor(Math.random() * 10) + 1,
+        completed: Math.round(Math.random() * 1) === 1
+      });
     }
   }
 }

@@ -6,5 +6,5 @@ export class SearchArgs {
   @Field(() => String, { nullable: true })  
   @IsOptional()
   @IsString()
-  search: string;
+  search?: string;
 }
