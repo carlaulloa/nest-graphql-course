@@ -12,10 +12,10 @@ import { ValidRoles } from './enums/valid-roles.enum';
 export class AuthResolver {
   constructor(private readonly authService: AuthService) { }
 
-  @Mutation(() => String, { name: 'signup' })
+  @Mutation(() => AuthResponse, { name: 'signup' })
   async signup(
     @Args('signupInput') signupInput: SignupInput
-  ): Promise<any> {
+  ): Promise<AuthResponse> {
     return this.authService.signup(signupInput)
   }
 
